@@ -8,8 +8,8 @@
     <style>
         *{  box-sizing:border-box; }
         /* body{ background-color:#ffeec1; } */
-        body{ background-color:#000; }
-        .list_box{ outline:5px solid #fff; border:8px solid #000; width:600px; padding:20px 30px; background-color:#fff; position:absolute; top:100px; left:50%; transform:translateX(-50%)}
+        body{ padding:100px 0; background-color:#000; }
+        .list_box{ outline:5px solid #fff; border:8px solid #000; width:600px; margin:0 auto; padding:20px 30px; background-color:#fff; position:inline-block; }
         .list_box > h1{ text-align:center; }
         .write_box{ height:50px; }
         .write_box > input{ border:none; border-bottom:5px solid #000; width:85%; height:100%; padding:0 20px; font-size:18px;  }
@@ -82,8 +82,37 @@ document.querySelector('#btnDelAll').addEventListener('click', delAllEle); //전
 document.querySelector('#btnDelLast').addEventListener('click', delLastEle); //마지막 항목 삭제
 document.querySelector('#DeleteSel').addEventListener('click', delSelected); //선택 삭제
 
+let contents = document.querySelector('.text_basic')
+let listBody = document.querySelector('#listBody');
+
 //추가
-function addList() {}
+function addList() {
+    if(!contents.value) {
+        alert('할일을 입력해 주세요!');
+        contents.focus();  //alert창 없앤 후 바로 input창에 커서 생기게 함.
+        return false;
+    }
+
+    // 새로 추가될 리스트 태그 생성.
+    let trNew = document.createElement('tr');
+    let inputNew = document.createElement('input');
+    // 새로 추가되는 input에 type, class속성을 추가.
+    inputNew.setAttribute('type', 'checkbox');
+    inputNew.setAttribute('class', 'btn_chk');
+
+    let tdNew01 = document.createElement('td');
+    trNew.appendChild(tdNew01);
+    tdNew01.appendChild(inputNew);
+    
+    let tdNew02 = document.createElement('td');
+    trNew.appendChild(tdNew02);
+    tdNew02.innerHTML = contents.value;
+
+    listBody.appendChild(trNew);
+
+    contents.value = '';
+    contents.focus();
+}
 
 //전체삭제
 function delAllEle() {}
