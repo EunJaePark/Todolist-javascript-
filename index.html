@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TodoList</title>
+
+    <style>
+        *{  box-sizing:border-box; }
+        /* body{ background-color:#ffeec1; } */
+        body{ background-color:#000; }
+        .list_box{ outline:5px solid #fff; border:8px solid #000; width:600px; padding:20px 30px; background-color:#fff; position:absolute; top:100px; left:50%; transform:translateX(-50%)}
+        .list_box > h1{ text-align:center; }
+        .write_box{ height:50px; }
+        .write_box > input{ border:none; border-bottom:5px solid #000; width:85%; height:100%; padding:0 20px; font-size:18px;  }
+        .write_box > input:focus{ outline:none; }
+        .write_box > button{ width:14%; height:75%; vertical-align:bottom; }
+        .list_table{ width:100%; margin:60px 0; }
+        .btn_area{ height:40px; margin-bottom:20px; text-align:center; }
+        .btn_area > *{ padding:0 15px; }
+
+        th{ background-color:#000; color:#fff; font-size:15px; }
+        tr{ height:40px; }
+        td{ border-bottom:4px solid #000; text-align:center; }
+        td > input{ cursor:pointer; }
+        button{ border:4px solid #000; height:100%; background-color:#000; font-size:13px; font-weight:700; color:#fff; cursor:pointer; }
+        button:hover{ background-color:#fff; color:#000; }
+    </style>
+</head>
+<body>
+    <div class="list_box">
+        <h1>Todo List</h1>
+        <div class="write_box">
+            <input type="text" class="text_basic" placeholder="추가할 할일을 입력하세요.">
+            <button type="button" id="btnAdd">추가</button>
+        </div><!--.write_box-->
+
+        <table class="list_table">
+            <colgroup>
+                <col width="10%">
+                <col width="90%">
+            </colgroup>
+            <thead>
+                <tr>
+                    <th>check</th>
+                    <th>Todo List</th>
+                </tr>
+            </thead>
+            <tbody id="listBody">
+                <tr>
+                    <td>
+                        <input type="checkbox" class="btn_chk">
+                    </td>
+                    <td>청소하기</td>
+                </tr>
+                <tr>
+                    <td>
+                        <input type="checkbox" class="btn_chk">
+                    </td>
+                    <td>숙제하기</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="btn_area">
+            <button type="button" id="DeleteSel">선택 삭제</button>
+            <button type="button" id="btnDelLast">마지막 항목 삭제</button>
+            <button type="button" id="btnDelAll">전체 삭제</button>
+        </div><!--.btn_area-->
+    </div><!--.list_box-->
+</body>
+
+<script>
+// 1. 인풋 텍스트에 할 일을 적고 '추가'버튼을 클릭하면 해당 내용이 담긴 행이 맨 밑에 만들어짐.
+// 2. 인풋 텍스트에 아무것도 적지 않고 '추가'버튼을 클릭하면 alert메시지가 출력됨.
+// 3. 체크박스를 체크하고 '선택삭제'버튼을 누르면 해당 행이 삭제됨.
+// 4. '마지막 항목 삭제'버튼을 누르면 테이블 마지막 행이 삭제됨.
+// 5. '전체삭제'버튼을 누르면 모든 행이 삭제됨.
+
+document.querySelector('#btnAdd').addEventListener('click', addList);  //추가
+document.querySelector('#btnDelAll').addEventListener('click', delAllEle); //전체삭제
+document.querySelector('#btnDelLast').addEventListener('click', delLastEle); //마지막 항목 삭제
+document.querySelector('#DeleteSel').addEventListener('click', delSelected); //선택 삭제
+
+//추가
+function addList() {}
+
+//전체삭제
+function delAllEle() {}
+
+//마지막 항목 삭제
+function delLastEle() {}
+
+//선택 삭제
+function delSelected() {}
+
+</script>
+</html>
