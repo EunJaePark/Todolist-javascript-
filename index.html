@@ -147,7 +147,15 @@ function delLastEle() {
 }
 
 //선택 삭제
-function delSelected() {}
+function delSelected() {
+    let chkbox = listBody.querySelectorAll('.btn_chk');
+    for(let i = 0; i < chkbox.length; i++) {
+        if(chkbox[i].checked == true /*&& chkbox[i].nodeType == 1*/) { //chkbox[i].nodeType == 1 를 검사하는 이유는??
+            listBody.removeChild(chkbox[i].parentNode.parentNode);
+        }
+    }
+    
+}
 
 </script>
 </html>
