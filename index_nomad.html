@@ -11,19 +11,28 @@
     </style>
 </head>
 <body>
+    <!--실시간 시계: clock()-->
     <div class="js-clock">
         <h1>00:00</h1>
     </div>
 
+    <!--이름+환영문구: gretting()-->
     <form class="js-form form">
         <input type="text" placeholder="What is your name?" />
     </form>
     <h4 class="js-greetings greetings">hello?</h4>
+
+    <!--todolist: todo()-->
+    <form class="js-toDoForm">
+        <input type="text" placeholder="What will you do?" />
+    </form>
+    <ul class="js-toDoList"></ul>
 </body>
 
 <script>
     clock();
     gretting();
+    todo();
 
 
     function clock() {
@@ -47,54 +56,6 @@
 
 
     function gretting() {
-    //     const form = document.querySelector('.js-form'),
-    //         input = form.querySelector("input"),
-    //         greeting = document.querySelector('js-greetings');
-    //     const USER_LS = "currentUser", //currentUser란게 원래 있는 건가??
-    //         SHOWING_CN = "showing";
-
-    //     function saveName(text) { //local storage에 받아온 이름정보를 저장.
-    //         localStorage.setItem(USER_LS, text);
-    //     }
-
-    //     function handleSubmit(event) {
-    //         event.preventDefault(); //enter키 누를 때 사이트 새로고침 방지.
-    //         const currentValue = input.value; //input에 적힌 이름 불러옴.
-    //         console.log(currentValue);
-    //         //아래 두개의 함수에 input에 적힌 이름 인자로 넘겨 줌.
-    //         paintGreeting(currentValue);
-    //         saveName(currentValue);
-    //     }
-
-
-    //     function askForName() {
-    //         form.classList.add(SHOWING_CN);
-    //         form.addEventListener('submit', handleSubmit); //input에 글 적고 enter키 누르면 hamdleSubmit함수 실행되도록 함.
-    //     }
-
-        
-    //     function paintGreeting(text) { //input에 적힌 이름 이용해서 인삿말 출력.
-    //         form.classList.remove(SHOWING_CN);
-    //         greeting.classList.add(SHOWING_CN);
-    //         greeting.innerText = `Hello ${text}!`
-    //     }
-
-    //     function loadName() {
-    //         const currentUser = localStorage.getItem(USER_LS);
-    //         if (currentUser === null) {
-    //             // show input form
-    //             askForName();
-    //         } else {
-    //             // showing greeting
-    //             paintGreeting(currentUser);
-    //         }
-    //     }
-
-    //     function init() {
-    //         loadName();
-    //     }
-    //     init();
-
         const form = document.querySelector(".js-form");
         const input = form.querySelector("input");
         const greeting = document.querySelector(".js-greetings");
@@ -152,6 +113,86 @@
         // 2-2. 있다면?
         //      - paintGreeting()에서 폼을 숨기고 인삿말을 출력합니다.
 
+    }
+
+
+    function todo() {
+        const toDoForm = document.querySelector('.js-toDoForm');
+        const toDoInput = toDoForm.querySelector('input');
+        const toDoList = document.querySelector('.js-toDoList');
+
+        const TODOS_LS = 'toDo'; //toDo는 localStorage에 저장시 이용하는 이름인거지????
+
+        let toDos = [];
+
+        function loadToDos() { // 5-2. forEach문을 이용해 배열 하나하나를 다 돌면서 함 수 실행.
+            const loadedToDos = localStorage.getItem(TODOS_LS);
+            if (loadedToDos !== null) {
+                const parsedToDos = JSON.parse(loadedToDos); //JSON = JavaScript Object Notation의 줄임말. object을 string으로, string을 object로 변환해준다.
+                // 여기선 string으로 받아진 값을 다시 object로 바꿔주기위해서 사용.
+                console.log(parsedToDos);
+                // 현재 단계까지는 위의 toDos 배열이 빈 상태인 것.
+
+                // toDos배열에 투두리스트들을 넣어줌.
+                parsedToDos.forEach(function(todo) { //여기서 todo는 parsedToDos 각각을 의미.
+                    printToDoValue(todo.text);
+                })
+            }
+        }
+
+        function saveToDo() { // 4. 할일 목록 local storage에 저장하기.
+            localStorage.setItem(TODOS_LS, JSON.stringify(toDos));
+            console.log(toDos);
+            console.log(JSON.stringify(toDos)); 
+            //JSON.stringify는 자바스크립트의 객체를 string으로 바꿔준다. 이렇게 하면 문자열로 출력이 되는 것.
+            // local storage에서는 자바스크립트의 data(:object)를 저장할 수 없다. 오직 string만 저장할 수 있기 때문.
+
+            // JSON.parse() 메서드는 JSON 문자열의 구문을 분석하고, 그 결과에서 JavaScript 값이나 객체를 생성합니다. 선택적으로, reviver 함수를 인수로 전달할 경우, 결과를 반환하기 전에 변형할 수 있습니다.
+            // JSON.parse(text[, reviver])
+
+            // 위의 설명 중 reviver함수를 인수로 전달할 경우, 결과를 반환하기 전에 변형할 수 있다는 예시!!
+            // JSON.parse('{"p": 5}', (key, value) =>
+            // typeof value === 'number'
+            //     ? value * 2 // 숫자라면 2배
+            //     : value     // 나머진 그대로
+            // );
+            // { p: 10 }          
+        }
+        
+        function printToDovalue(text) { // 3. 입력한 할일 요소 인자로 받아 함수 실행.
+            // 할일목록 넣어줄 li만들어줌.(li 속에 span, button도 생성해서 넣어줌)
+            const li = document.createElement('li'); 
+            const span = document.createElement('span');
+            const button = document.createElement('button');
+            span.innerText = text; // text = 인자로 받아온 할일요소.
+            button.innerText = '❌x';
+            li.appendChild(span);
+            li.appendChild(button);
+            const newId = toDos.length + 1; // 0부터 시작하니까 +1해줌.
+            li.id = newId;  // 각 할일 리스트에 숫자 붙여줌.
+            toDoList.appendChild(li);
+            const toDoObj = { // 할일내용과 번호 객체 생성. local storage에도 투두리스트를 저장해줘야하기 때문에 이런 형식으로 만든 것. 
+                text: text,
+                id: newId
+            };
+            toDos.push(toDoObj); // 제일 위에서 만든 toDos 배열에 toDoObj 넣어줌.
+            saveToDo(); //바로 위에서 배열에 투두리스트를 넣어준 다음에, local storage에도 저장해주는 함수를 실행.
+        }
+
+        function handleToDoSubmit(event) { // 2. 함수실행.
+            event.preventDefault(); // enter키 누를 때 사이트 새로고침 막음.
+            const currentValue = toDoInput.value; // input에 입력한 할일 이름 선언.
+            printToDovalue(currentValue); 
+            
+            toDoInput.value = '';
+        }
+        
+
+        function init() {
+            loadToDos(); // 5. 로컬스토리지에 있는 모든 배열요소를 함수의 인자로 넣는 함수 실행.
+            toDoForm.addEventListener('submit', handleToDoSubmit); //1. 할일 입력 후 엔터키 누르면 handleToDoSubmit()함수 실행. 
+        }
+        init();
     }
 </script>
 </html>
