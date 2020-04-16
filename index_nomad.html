@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TodoList-nomad</title>
+    <style>
+        .form,
+        .greetings{ display:none; }
+        .showing{ display:block; }
+    </style>
+</head>
+<body>
+    <div class="js-clock">
+        <h1>00:00</h1>
+    </div>
+
+    <form class="js-form form">
+        <input type="text" placeholder="What is your name?" />
+    </form>
+    <h4 class="js-greetings greetings">hello?</h4>
+</body>
+
+<script>
+    clock();
+    gretting();
+
+
+    function clock() {
+        const clockContainer = document.querySelector('.js-clock'),
+            clockTitle = clockContainer.querySelector('h1');
+
+        function getTime() {
+            const date = new Date();
+            const minutes = date.getMinutes();
+            const hours = date.getHours();
+            const seconds = date.getSeconds();
+            clockTitle.innerText = `${hours < 10 ? `0${hours}` : hours} : ${minutes < 10 ? `0${minutes}` : minutes} : ${seconds < 10 ? `0${seconds}` : seconds}`;
+        }
+
+        function init() {
+            getTime();
+            setInterval(getTime, 1000);    
+        }
+        init();
+    }
+
+
+    function gretting() {
+    //     const form = document.querySelector('.js-form'),
+    //         input = form.querySelector("input"),
+    //         greeting = document.querySelector('js-greetings');
+    //     const USER_LS = "currentUser", //currentUser란게 원래 있는 건가??
+    //         SHOWING_CN = "showing";
+
+    //     function saveName(text) { //local storage에 받아온 이름정보를 저장.
+    //         localStorage.setItem(USER_LS, text);
+    //     }
+
+    //     function handleSubmit(event) {
+    //         event.preventDefault(); //enter키 누를 때 사이트 새로고침 방지.
+    //         const currentValue = input.value; //input에 적힌 이름 불러옴.
+    //         console.log(currentValue);
+    //         //아래 두개의 함수에 input에 적힌 이름 인자로 넘겨 줌.
+    //         paintGreeting(currentValue);
+    //         saveName(currentValue);
+    //     }
+
+
+    //     function askForName() {
+    //         form.classList.add(SHOWING_CN);
+    //         form.addEventListener('submit', handleSubmit); //input에 글 적고 enter키 누르면 hamdleSubmit함수 실행되도록 함.
+    //     }
+
+        
+    //     function paintGreeting(text) { //input에 적힌 이름 이용해서 인삿말 출력.
+    //         form.classList.remove(SHOWING_CN);
+    //         greeting.classList.add(SHOWING_CN);
+    //         greeting.innerText = `Hello ${text}!`
+    //     }
+
+    //     function loadName() {
+    //         const currentUser = localStorage.getItem(USER_LS);
+    //         if (currentUser === null) {
+    //             // show input form
+    //             askForName();
+    //         } else {
+    //             // showing greeting
+    //             paintGreeting(currentUser);
+    //         }
+    //     }
+
+    //     function init() {
+    //         loadName();
+    //     }
+    //     init();
+
+        const form = document.querySelector(".js-form");
+        const input = form.querySelector("input");
+        const greeting = document.querySelector(".js-greetings");
+
+        const USER_LS = "currentUser";  //currentUser란게 원래 있는 건가???????????
+        const SHOWING_CN = "showing";
+
+        function saveName(text) { //local storage에 받아온 이름정보를 저장.
+        localStorage.setItem(USER_LS, text);
+        }
+
+        function handleSubmit(event) {
+        event.preventDefault(); //enter키 누를 때 사이트 새로고침 방지.
+        const currentValue = input.value; //input에 적힌 이름 불러옴.
+        //아래 두개의 함수에 input에 적힌 이름 인자로 넘겨 줌.
+        paintGreeting(currentValue);
+        saveName(currentValue);
+        }
+        
+        function askForName() {
+        form.classList.add(SHOWING_CN); //input칸 그대로 보이게함.
+        form.addEventListener("submit", handleSubmit); //input에 글 적고 enter키 누르면 hamdleSubmit함수 실행되도록 함.
+        }
+
+        function paintGreeting(text) { //input에 적힌 이름 이용해서 인삿말 출력.
+            form.classList.remove(SHOWING_CN); //input칸 없애기.
+            greeting.classList.add(SHOWING_CN);
+            greeting.innerText = `Hello ${text}`;
+        }
+
+        function loadName() {
+            const currentUser = localStorage.getItem(USER_LS);
+            if (currentUser === null) {
+                // show input form
+                askForName();
+            } else {
+                // showing greeting
+                paintGreeting(currentUser);
+                // 왜 바로 이름을 적었을 경우에는 saveName()을 실행시키지 않아도 자동으로 로컬스토리지에 저장이 되는거야????????
+            }
+        }
+
+        function init() {
+        loadName();
+        }
+
+        init();
+
+        // 1. loadName()에서 LocalStorage에 currentUser 키가 있는지 확인합니다.
+        // 2-1. 없다면?
+        //      - askForMe()에서 폼 태그를 보이게 하고 이벤트 리스너를 엽니다.
+        //      - handleSubmit()에서 폼에서 온 데이터를 저장하고 출력, 저장 함수로 보냅니다.
+        //      - paintGreeting()에서 폼을 숨기고 인삿말을 보이게 한 뒤 출력합니다.
+        //      - saveName()에서 로컬스토리지에 데이터를 저장합니다.
+        // 2-2. 있다면?
+        //      - paintGreeting()에서 폼을 숨기고 인삿말을 출력합니다.
+
+    }
+</script>
+</html>
