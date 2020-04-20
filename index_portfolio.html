@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>To do List</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css?family=Noto+Sans+KR:400,900&display=swap&subset=korean');
+        *{ margin:0; padding:0; box-sizing:border-box; font-family: 'Noto Sans KR', sans-serif; }
+        body{ background-color:#8377ca; color:#353434; }
+        input{ border:none; border-bottom:3px solid #353434; line-height:40px; font-size:20px; color:#353434; background-color:transparent; }
+        .wrap{ width:100vw; height:100vh; }
+        .show{ display:block !important; }
+        .opacity1{ opacity:1 !important; transition:all .4s ease-out; }
+
+        .greetingsBox{ width:100%; height:100%; background-color: #fff9df; position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); overflow:hidden; opacity:1; }
+        .greetingsBoxReduc{ width:500px; height:700px; opacity:0; transition:all .5s ease-in; }
+        .greetingsBox > .nameForm{ position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); }
+        .greetingsBox > .nameForm > h2{ font-size:60px; color:#353434; text-align:center; }
+        .greetingsBox > .nameForm > input{ width:500px; line-height:70px; margin:50px auto 0; font-size:50px; text-align:center; display:block; }
+        .greetingsBox > .nameForm > input:focus{ outline:none; }
+
+        .todolistBox{ border:7px solid #353434; width:500px; height:700px; margin:100px auto 0; padding:30px 20px; background-color:#fff9df; display:none; opacity:0; position:relative; }
+        .todolistBox > .title{ font-size:30px; text-align:center; }
+        .todolistBox > .todoForm{ outline:1px solid blue; }
+        .todolistBox > .todoForm > input{ width:100%; }
+        .todolistBox > .close{ border:none; font-size:30px; font-weight:900;  background-color:transparent; cursor:pointer; position:absolute; top:-50px; right:0; }
+    </style>
+</head>
+<body>
+    <div class="wrap">
+        <div class="greetingsBox">
+            <form class="nameForm"> 
+            <h2>안녕하세요,</h2>             
+                <input type="text" placeholder="이름을 입력해 주세요 !" />
+            </form>
+        </div><!--.greetingsBox-->
+
+        <div class="todolistBox">
+            <h4 class="title"></h4>
+            <form class="todoForm">
+                <input type="text" placeholder="할 일을 입력해 주세요 !" />
+            </form>
+
+            <ul class="todoList"></ul>
+            <button class="close">✕</button>
+        </div><!--.todolistBox-->
+    </div><!--.wrap-->
+</body>
+
+<script>
+const greetingsBox = document.querySelector('.greetingsBox');
+const nameForm = document.querySelector('.nameForm');
+const name = nameForm.querySelector('input');
+const todolistBox = document.querySelector('.todolistBox');
+const title = todolistBox.querySelector('.title');
+
+
+userNameSave();
+
+// 사용자 이름 저장.
+function userNameSave() {
+    const UserName = 'currentUser'
+
+    function saveName(text) {
+        localStorage.setItem(UserName, text);
+    }
+
+    function handleSubmit(e) {
+        e.preventDefault();
+
+        if(name.value === null || typeof name.value == 'string' && name.value.trim() == '') {
+            alert('이름을 입력해 주세요');
+            name.value = null;
+            greetingsBox.classList.add('greetingsBox');
+        } else {
+            const currentValue = name.value;
+
+            paintingTodolistBox(currentValue);
+            saveName(currentValue);
+        }
+    }
+
+    function paintingTodolistBox(text) {
+        greetingsBox.classList.add('greetingsBoxReduc');
+        todolistBox.classList.add('show');
+        setTimeout(function() {
+            todolistBox.classList.add('opacity1');
+        }, 400);
+        title.innerText = `${text}'s TodoList`;
+    }
+
+    function loadName() {
+        const currentUser = localStorage.getItem(UserName);
+        if(currentUser === null) {
+            console.log(name.value);
+            
+            nameForm.addEventListener('submit', handleSubmit);       
+        } else {
+            paintingTodolistBox(currentUser);
+        }
+    }   
+
+    loadName();
+}
+
+// close버튼(local storage 초기화 버튼) 함수
+const closeBtn = document.querySelector('.close');
+closeBtn.addEventListener('click', function reset() {
+    const UserName = 'currentUser';
+
+    localStorage.clear();
+    name.value = null;
+    todolistBox.classList.remove('show');
+    todolistBox.classList.remove('opacity1');
+    greetingsBox.classList.remove('greetingsBoxReduc');
+})
+
+</script>
+
+</html>

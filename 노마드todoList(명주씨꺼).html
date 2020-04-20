@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>todoList</title>
+    <style>
+        body{
+            color:#34495e
+        }
+        .form,.greetings{display: none;}
+        .showing{display: block;}
+        ul,li{list-style: none;}
+        li{padding:5px 0;}
+        .checked span {
+            text-decoration: line-through;
+            color: rgba(0, 0, 0, 0.5);
+        }
+        .delete_btn{margin: 5px;}
+        input[type=checkbox] { 
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+ 
+    <form class="js-form form">
+        <input type="text" placeholder="What is your name">
+    </form>
+    <h4 class="js-greetings greetings"></h4>
+    <form class="js-todoForm">
+        <input type="text" placeholder="Write a to do">
+        <a href="" class="edit_btn">수정</a>
+    </form>
+    <ul class="js-toDoList"></ul>
+
+   
+
+
+    <script>
+        //사용자 이름 저장
+        const form = document.querySelector('.js-form');
+        const input = document.querySelector('input')
+        const greeting = document.querySelector('.js-greetings')
+
+        const USER_LS = 'currentUser'
+        const SHOWING_CN = 'showing'
+
+        //로컬에 유저 네임 저장 함수
+        function saveName(text){
+            localStorage.setItem(USER_LS,text)
+        }
+
+        //엔터키를 눌러서 입력창의 값을 전송
+        function handleSubmit(ev){
+            ev.preventDefault();
+            const currentValue = input.value;
+
+            paintGreeting(currentValue)
+            saveName(currentValue);
+        }
+
+        //이름을 입력하도록 요청하는 함수
+        function askForName(){
+            form.classList.add(SHOWING_CN)
+            form.addEventListener('submit',handleSubmit)
+        }
+
+
+        function paintGreeting(text){
+            form.classList.remove(SHOWING_CN);
+            greeting.classList.add(SHOWING_CN);
+            greeting.innerText = `hello ${text}`;
+        }
+
+        function loadName(){
+            const currentUser = localStorage.getItem(USER_LS);
+            //유저가 없는 경우
+            if( currentUser === null){
+                askForName()
+
+            }else{//유저가 있는 경우
+                paintGreeting(currentUser)
+            }
+        }
+
+
+        function init(){
+            loadName()
+        }
+
+        init();
+
+        //투두리스트
+
+        // 1. 완료버튼 - 완료되면 선 긋고 블러처리
+        // 2. 수정버튼 
+        // 3. 사용자 수정
+        const toDoForm = document.querySelector('.js-todoForm');
+        const toDoInput = toDoForm.querySelector('input');
+        const toDoList = document.querySelector('.js-toDoList')
+        const btn = document.querySelector('.edit_btn')
+        const TODOS_LS = 'toDos';
+        let toDos = []; //투두리스트 배열
+        let editValue = '';
+
+        //로컬에 저장
+        function saveToDos(){
+            localStorage.setItem(TODOS_LS, JSON.stringify(toDos)) //로컬에 투두리스트 배열을 json형식으로 저장
+            //로컬에는 자바스크립트 형태의 데이터를 저장할 수 없음
+            //JSON.stringify를 사용하면 object형식을 string으로 바꿔줌
+        }
+
+        //삭제 이벤트 함수
+        function deleteToDo(ev){
+            const btn = ev.target
+            const li = btn.parentNode;
+
+            toDoList.removeChild(li)
+
+            //filter 조건에 일치하는 것만 출력
+            const cleanToDo = toDos.filter(function(toDo){
+                return toDo.id !== parseInt(li.id) //모든 toDo.id가 li.id와 같지 않을때
+                // parseInt는 string을 number로 바꿀 수 있는 것이다.
+                // string으로 바꼈었던 id숫자를 비교하기 위해서 다시 숫자로 바꿔주기 위해서 parseInt를 사용한 것이다.
+            })
+
+
+            toDos = cleanToDo
+
+            saveToDos() // 삭제된 후의 목록들을 다시 local storage에도 연결을 시켜주기 위해서 다시 saveToDos()함수를 실행하는 것.
+        }  
+
+        // //체크박스 함수
+        // function checkToDo(ev){
+        //     if( ev.target.checked === true ){
+        //         ev.target.parentNode.classList.add('checked')
+        //     }else{
+        //         ev.target.parentNode.classList.remove('checked')
+        //     }
+
+        //     // localStorage.setItem(TODOS_LS, JSON.stringify(ev.checked))
+        // }
+
+        // // const editBtn = document.createElement('button'); 
+
+        // // function editEvent(text,id){
+        // //     //console.log(text,id);
+        // //     //console.log(toDos[id].text);
+            
+        // //     //input 형제가 없을때 수정하기 버튼 만들기
+        // //     toDoInput.value = text
+        // //     toDos[id].text = toDoInput.value
+        // //     toDos[id].innerText = text
+            
+
+        // //     subEvent(text,id)
+            
+        // // }
+        
+        
+
+        function paintToDo(text, checkNow){
+            console.log(checkNow);
+            
+            const liElm = document.createElement('li')
+            const delBtn = document.createElement('button');
+            const span = document.createElement('span');
+            const checkBox = document.createElement('input');
+            const edit = document.createElement('button');
+            const newId = toDos.length + 1; 
+
+            delBtn.innerText = 'delete'
+            checkBox.type = 'checkbox'
+            edit.innerText = 'edit'
+
+            delBtn.classList.add('delete_btn')
+            
+            span.innerText = text
+
+            delBtn.addEventListener('click', deleteToDo)
+            checkBox.addEventListener('click', checkToDo)
+
+            // //수정버튼 클릭 이벤트
+            // edit.addEventListener('click',function(ev){
+            //     const toDoId = ev.target.parentNode.id
+            //     const txt = ev.target.parentNode.querySelector('span').innerText
+            //     toDoInput.value = txt
+
+            //     btn.addEventListener('click',function(ev){
+            //         ev.preventDefault();
+
+            //         btnEvent(toDoId,txt,span)
+            //         // span.innerText = toDoInput.value
+            //         // toDos[toDoId].text = toDoInput.value
+
+            //         // toDoInput.value= ''
+            //         // console.log(toDos);
+                    
+            //         // saveToDos()
+
+            //         toDoInput.value = ''
+            //     })
+
+
+            // }); //수정 이벤트
+
+
+            //체크박스 함수
+            // let checkNow;
+            
+            function checkToDo(ev) {
+                checkkk = ev.target.checked;
+                console.log(`checkkk값: ${checkkk}`);
+                
+                // checkBox.checked = checkNow;
+                console.log(checkBox.checked);
+
+                let checkBoxId = ev.target.parentNode.id;
+                if( ev.target.checked == true ){
+                    ev.target.parentNode.classList.add('checked');
+                    // let checkBoxId = ev.target.parentNode.id;
+                    console.log(checkBoxId);
+
+                    toDos[checkBoxId - 1].checkStatus = checkkk;
+                    
+                }else{
+                    ev.target.parentNode.classList.remove('checked');
+                    // let checkBoxId = ev.target.parentNode.id;
+                    toDos[checkBoxId - 1].checkStatus = checkkk;
+                }
+
+                saveToDos();
+            }
+            
+            
+            
+
+            liElm.appendChild(span)
+            liElm.appendChild(delBtn)
+            liElm.appendChild(edit)
+            liElm.insertBefore(checkBox,liElm.firstElementChild)
+
+            liElm.id = newId;        
+            
+            toDoList.appendChild(liElm)
+
+
+            // 1.(체크박스)
+             //checkStatus에 디폴트 값을 줘놓기 위한 if else문.
+            // if(checkNow == true) {
+            //     checkkk = true;
+            // } else {
+            //     checkkk = false;
+            // }
+            
+            // (체크박스)
+            // checkStatus에 디폴트 값을 줘놓기 위함(페이지를 불러올때마다.)
+            let li = document.querySelectorAll('li');
+            let liCheckBox = document.querySelector(' li > input');
+                                  
+            if(li) {
+                console.log(checkBox);
+                if(checkNow === true) {
+                    checkkk = true;
+                    console.log('li에 체크되어있다!!!!!!!!!!!!');
+                    checkBox.checked = true
+                    liElm.classList.add('checked');
+                }
+                else{
+                    checkkk = false;
+                    checkBox.checked = false;
+                    liElm.classList.remove('checked');
+                } 
+            }
+            
+            
+            
+            // if(localStorage.getItem(toDos.checkStatus)) {
+            //     checkNow = JSON.parse(localStorage.getItem(toDos, checkStatus));
+            //     for(let i = 0; i < toDos.length; i++) {
+            //         toDos[i].checkStatus = checkkk
+            //     }
+            // }
+            
+
+            const toDoObj = {
+                text:text,
+                id:newId,
+                checkStatus: checkkk
+                // checkStatus: false //checkBox는 기본적으로 체크가 되어있지 않는 상태이기 때문에 디폴트값을 false로 주었다.
+            }
+              
+            
+
+            toDos.push(toDoObj)
+
+            saveToDos()
+        }
+
+        function btnEvent(id,txt,span){
+            id = id * 1
+            span.innerText = toDoInput.value
+            
+            toDos[id - 1].text = span.innerText
+            
+            console.log(toDos);
+            console.log(id - 1);
+            
+            saveToDos()
+        }
+
+        //입력값 전달 함수
+        function formHandleSubmit(ev){
+            ev.preventDefault();
+            const currentValue = toDoInput.value;
+             
+            paintToDo(currentValue) //페인트 함수에 입력된 value 값 전달
+
+            toDoInput.value = ''; //input 리셋
+        }
+
+        //forEach에 출력할 실행 함수
+        // function something(toDo){
+        //     console.log(toDo.text); 
+        // }
+
+        //로컬에 있는 투두리스트 불러오기
+        function loadToDos(){
+            const loadedToDos = localStorage.getItem(TODOS_LS)
+            
+            
+            if( loadedToDos !== null ){
+                const parsedToDos = JSON.parse(loadedToDos); 
+                // 로컬에서 투두리스트는 string 형태로 저장되어있음 
+                // 이것을 객체로 변경해주기 위한 과정
+                
+                //parsedToDos.forEach(something) // forEach - 바깥에 함수를 두고 실행할 수 있음
+                parsedToDos.forEach(function(toDo){
+                    localStorage.getItem(toDo);
+                    console.log(toDo);
+                    console.log(toDo.checkStatus);
+                    
+                    paintToDo(toDo.text, toDo.checkStatus)
+                    //console.log(toDo.text);
+                    
+                })
+
+            }
+        }
+
+        //상위 함수 
+        function FormInit(){
+            loadToDos();
+            toDoForm.addEventListener('submit', formHandleSubmit) //input을 전달 받기 위한 이벤트
+            //toDoForm.addEventListener('submit',editSubmit)
+        }
+
+        FormInit()
+    </script>
+</body>
+</html>
