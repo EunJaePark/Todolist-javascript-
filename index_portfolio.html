@@ -9,6 +9,8 @@
         *{ margin:0; padding:0; box-sizing:border-box; font-family: 'Noto Sans KR', sans-serif; }
         body{ background-color:#8377ca; color:#353434; }
         input{ border:none; border-bottom:3px solid #353434; line-height:40px; font-size:20px; color:#353434; background-color:transparent; }
+        input:focus{ outline:none; }
+        button:focus{ outline:none; }
         .wrap{ width:100vw; height:100vh; }
         .show{ display:block !important; }
         .opacity1{ opacity:1 !important; transition:all .4s ease-out; }
@@ -17,13 +19,12 @@
         .greetingsBoxReduc{ width:500px; height:700px; opacity:0; transition:all .5s ease-in; }
         .greetingsBox > .nameForm{ position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); }
         .greetingsBox > .nameForm > h2{ font-size:60px; color:#353434; text-align:center; }
-        .greetingsBox > .nameForm > input{ width:500px; line-height:70px; margin:50px auto 0; font-size:50px; text-align:center; display:block; }
-        .greetingsBox > .nameForm > input:focus{ outline:none; }
+        .greetingsBox > .nameForm > input{ border:7px solid #353434; width:500px; line-height:70px; margin:30px auto 0; font-size:40px; text-align:center; display:block; }
 
         .todolistBox{ border:7px solid #353434; width:500px; height:700px; margin:100px auto 0; padding:30px 20px; background-color:#fff9df; display:none; opacity:0; position:relative; }
         .todolistBox > .title{ font-size:30px; text-align:center; }
-        .todolistBox > .todoForm{ outline:1px solid blue; }
-        .todolistBox > .todoForm > input{ width:100%; }
+        .todolistBox > .todoForm{ outline:1px solid blue; margin-top:20px; }
+        .todolistBox > .todoForm > input{ width:100%; padding:0 20px; }
         .todolistBox > .close{ border:none; font-size:30px; font-weight:900;  background-color:transparent; cursor:pointer; position:absolute; top:-50px; right:0; }
     </style>
 </head>
@@ -50,13 +51,115 @@
 
 <script>
 const greetingsBox = document.querySelector('.greetingsBox');
-const nameForm = document.querySelector('.nameForm');
+const nameForm = greetingsBox.querySelector('.nameForm');
 const name = nameForm.querySelector('input');
+
 const todolistBox = document.querySelector('.todolistBox');
+const todoForm = todolistBox.querySelector('.todoForm');
+const todolistInput = todolistBox.querySelector('input');
 const title = todolistBox.querySelector('.title');
+const todoList = document.querySelector('.todoList');
 
 
 userNameSave();
+todolistSave();
+
+// todolist 저장.
+function todolistSave() {
+    const TodosList = 'toDos';
+    let toDos = [];
+
+    // local Storage에 저장하는 함수.
+    function saveToDos() {
+        localStorage.setItem(TodosList, JSON.stringify(toDos))
+    }
+
+    // 삭제 버튼 클릭시 해당 리스트 삭제 함수.
+    function deleteToDo(e) {
+        const btn = e.target;
+        const li = btn.parentNode;
+
+        todoList.removeChild(li);
+
+        // filter조건에 맞는 리스트들만 출력.
+        const cleanToDo = toDos.filter(function(toDo) {
+            return toDo.id !== parseInt(li.id)
+        })
+
+        toDos = cleanToDo;
+
+        // 삭제된 리스트들을 다시 local storage에 저장시켜주는 함수 실행.
+        saveToDos();
+    }
+
+    // todo리스트 생성 함수
+    function paintToDo(text) {
+        const liElm = document.createElement('li');
+        const delBtn = document.createElement('button');
+        const span = document.createElement('span');
+        const checkBox = document.createElement('input');
+        const edit = document.createElement('button');
+        const newId = toDos.length + 1;
+
+        liElm.appendChild(span);
+        liElm.appendChild(delBtn);
+        liElm.appendChild(edit);
+        liElm.insertBefore(checkBox, liElm.firstElementChild)
+
+        delBtn.innerText = '✕';
+        checkBox.type = 'checkbox';
+        edit.innerText = '✐';
+
+        delBtn.classList.add('delete_btn');
+
+        span.innerText = text;
+
+        delBtn.addEventListener('click', deleteToDo)
+        // checkBox.addEventListener('click', checkToDo)
+
+
+        liElm.id = newId;
+
+        todoList.appendChild(liElm)
+
+        const toDoObj = {
+            text: text,
+            id: newId,
+
+        }
+
+        toDos.push(toDoObj);
+
+        saveToDos();
+    }
+
+    function formHandleSubmit(e) {
+        e.preventDefault();
+        const currentValue = todolistInput.value;
+        
+        paintToDo(currentValue);
+
+        todolistInput.value = '';
+    }
+
+    // localStorage에 있는 투두리스트 불러옴.
+    function loadToDos() {
+        const loadedToDos = localStorage.getItem(TodosList);
+        if(loadedToDos !== null) {
+            const parsedToDos = JSON.parse(loadedToDos);
+
+            parsedToDos.forEach(function(toDo) {
+                paintToDo(toDo.text)
+            })
+        }
+    }
+
+    function init() {
+        loadToDos();
+        todoForm.addEventListener('submit', formHandleSubmit);
+    }
+    init();
+}
 
 // 사용자 이름 저장.
 function userNameSave() {
@@ -92,12 +195,11 @@ function userNameSave() {
 
     function loadName() {
         const currentUser = localStorage.getItem(UserName);
-        if(currentUser === null) {
-            console.log(name.value);
-            
+        if(currentUser === null) { // localStorage에 currentUser가 없을 때.
+            name.focus();
             nameForm.addEventListener('submit', handleSubmit);       
-        } else {
-            paintingTodolistBox(currentUser);
+        } else { // localStorage에 currentUser가 있을 때,
+            paintingTodolistBox(currentUser); // todolist가 보이게 함.
         }
     }   
 
@@ -114,6 +216,7 @@ closeBtn.addEventListener('click', function reset() {
     todolistBox.classList.remove('show');
     todolistBox.classList.remove('opacity1');
     greetingsBox.classList.remove('greetingsBoxReduc');
+    name.focus();
 })
 
 </script>
