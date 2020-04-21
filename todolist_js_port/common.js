@@ -75,7 +75,7 @@ function todolistSave() {
         const month = today.getMonth();
         const date = today.getDate();
         const day = today.getDay();
-        const week = ['일', 'mon', '화', 'wed', 'thu', 'fri', 'sat', ];
+        const week = ['일', '월', '화', '수', '목', '금', '토', ];
 
         const writeDate = `${year}년 ${month + 1}월 ${date}일 ${week[day]}요일`;
         
