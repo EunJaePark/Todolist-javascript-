@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -30,7 +30,7 @@
     <h4 class="js-greetings greetings"></h4>
     <form class="js-todoForm">
         <input type="text" placeholder="Write a to do">
-        <a href="" class="edit_btn">수정</a>
+        <!-- <a href="" class="edit_btn">수정</a> -->
     </form>
     <ul class="js-toDoList"></ul>
 
@@ -38,6 +38,8 @@
 
 
     <script>
+         let editStatus = true; 
+
         //사용자 이름 저장
         const form = document.querySelector('.js-form');
         const input = document.querySelector('input')
@@ -99,7 +101,7 @@
         const toDoForm = document.querySelector('.js-todoForm');
         const toDoInput = toDoForm.querySelector('input');
         const toDoList = document.querySelector('.js-toDoList')
-        const btn = document.querySelector('.edit_btn')
+        const editBtn = document.querySelector('.edit_btn')
         const TODOS_LS = 'toDos';
         let toDos = []; //투두리스트 배열
         let editValue = '';
@@ -129,35 +131,46 @@
             toDos = cleanToDo
 
             saveToDos() // 삭제된 후의 목록들을 다시 local storage에도 연결을 시켜주기 위해서 다시 saveToDos()함수를 실행하는 것.
-        }  
-
-        // //체크박스 함수
-        // function checkToDo(ev){
-        //     if( ev.target.checked === true ){
-        //         ev.target.parentNode.classList.add('checked')
-        //     }else{
-        //         ev.target.parentNode.classList.remove('checked')
-        //     }
-
-        //     // localStorage.setItem(TODOS_LS, JSON.stringify(ev.checked))
-        // }
-
-        // // const editBtn = document.createElement('button'); 
-
-        // // function editEvent(text,id){
-        // //     //console.log(text,id);
-        // //     //console.log(toDos[id].text);
-            
-        // //     //input 형제가 없을때 수정하기 버튼 만들기
-        // //     toDoInput.value = text
-        // //     toDos[id].text = toDoInput.value
-        // //     toDos[id].innerText = text
-            
-
-        // //     subEvent(text,id)
-            
-        // // }
+        } 
         
+
+        // 수정 함수.
+        // let editStatus = true; 
+
+        let toDoLis = null;
+        let index = null;
+        function editToDo(e) {
+            toDoLis = e.target.parentNode
+            index = toDoLis.id - 1;
+            console.log(toDoLis);              
+            console.log(index);
+
+            
+            if( toDos[index].checkStatus === true) return;
+              
+            
+            editStatus = !editStatus; //false로 바꿔줌.
+            toDoInput.value = toDos[index].text; //원래 내용을 다시 input으로 전달.
+
+                
+        }
+
+        function editInputText(e) {
+            e.preventDefault();
+
+            if( !editStatus ) {
+                console.log('처음입력해도 적용되나????');
+                
+                toDos[index].text = toDoInput.value;
+                toDoLis.querySelector('span').innerText = toDoInput.value;
+
+                toDoInput.value = '';
+                editStatus = true;
+
+
+                saveToDos();
+            }
+        }
         
 
         function paintToDo(text, checkNow){
@@ -181,34 +194,12 @@
             delBtn.addEventListener('click', deleteToDo)
             checkBox.addEventListener('click', checkToDo)
 
-            // //수정버튼 클릭 이벤트
-            // edit.addEventListener('click',function(ev){
-            //     const toDoId = ev.target.parentNode.id
-            //     const txt = ev.target.parentNode.querySelector('span').innerText
-            //     toDoInput.value = txt
+            edit.addEventListener('click', editToDo);
 
-            //     btn.addEventListener('click',function(ev){
-            //         ev.preventDefault();
-
-            //         btnEvent(toDoId,txt,span)
-            //         // span.innerText = toDoInput.value
-            //         // toDos[toDoId].text = toDoInput.value
-
-            //         // toDoInput.value= ''
-            //         // console.log(toDos);
-                    
-            //         // saveToDos()
-
-            //         toDoInput.value = ''
-            //     })
-
-
-            // }); //수정 이벤트
-
+            
 
             //체크박스 함수
-            // let checkNow;
-            
+            // let checkNow;          
             function checkToDo(ev) {
                 checkkk = ev.target.checked;
                 console.log(`checkkk값: ${checkkk}`);
@@ -246,13 +237,6 @@
             toDoList.appendChild(liElm)
 
 
-            // 1.(체크박스)
-             //checkStatus에 디폴트 값을 줘놓기 위한 if else문.
-            // if(checkNow == true) {
-            //     checkkk = true;
-            // } else {
-            //     checkkk = false;
-            // }
             
             // (체크박스)
             // checkStatus에 디폴트 값을 줘놓기 위함(페이지를 불러올때마다.)
@@ -275,14 +259,6 @@
             }
             
             
-            
-            // if(localStorage.getItem(toDos.checkStatus)) {
-            //     checkNow = JSON.parse(localStorage.getItem(toDos, checkStatus));
-            //     for(let i = 0; i < toDos.length; i++) {
-            //         toDos[i].checkStatus = checkkk
-            //     }
-            // }
-            
 
             const toDoObj = {
                 text:text,
@@ -298,26 +274,18 @@
             saveToDos()
         }
 
-        function btnEvent(id,txt,span){
-            id = id * 1
-            span.innerText = toDoInput.value
-            
-            toDos[id - 1].text = span.innerText
-            
-            console.log(toDos);
-            console.log(id - 1);
-            
-            saveToDos()
-        }
 
         //입력값 전달 함수
         function formHandleSubmit(ev){
             ev.preventDefault();
             const currentValue = toDoInput.value;
-             
-            paintToDo(currentValue) //페인트 함수에 입력된 value 값 전달
 
-            toDoInput.value = ''; //input 리셋
+            if(editStatus) {  // editStatus는 전역변수로 선언해줬기 떄문에 여기서 사용가능하다. 수정할떄던 처음에 리스트 추가할 떄든 상관없이 조건을 걸 수 있는 것.
+             
+                paintToDo(currentValue) //페인트 함수에 입력된 value 값 전달
+
+                toDoInput.value = ''; //input 리셋
+            } else return false;
         }
 
         //forEach에 출력할 실행 함수
@@ -353,7 +321,7 @@
         function FormInit(){
             loadToDos();
             toDoForm.addEventListener('submit', formHandleSubmit) //input을 전달 받기 위한 이벤트
-            //toDoForm.addEventListener('submit',editSubmit)
+            toDoForm.addEventListener('submit', editInputText)
         }
 
         FormInit()
